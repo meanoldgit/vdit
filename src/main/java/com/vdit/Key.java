@@ -14,8 +14,8 @@ class Key implements KeyListener {
     FileManager fileManager;
     Terminal terminal;
     
-    int screenHeight = 10;
-    int screenWidth = 70;
+    int screenHeight;
+    int screenWidth;
     int scroll = 0;
     char action;
     char letter;
@@ -33,7 +33,22 @@ class Key implements KeyListener {
 
         try {
             this.terminal = TerminalBuilder.builder().build();
-            System.out.println(terminal.getWidth());
+            this.screenHeight = terminal.getHeight();
+            this.screenWidth = terminal.getWidth();
+            System.out.println(screenWidth + "x" + screenHeight);
+
+            Thread thread = new Thread(() -> {
+                while (true) {
+                    if (this.screenHeight != terminal.getHeight()
+                    || this.screenWidth != terminal.getWidth()) {
+                        this.screenHeight = terminal.getHeight();
+                        this.screenWidth = terminal.getWidth();
+                        System.out.println(screenWidth + "x" + screenHeight);
+                    }
+                }
+            });
+
+            thread.start();
         }
         catch (IOException e) {
             e.printStackTrace();
@@ -67,20 +82,22 @@ class Key implements KeyListener {
     public void keyTyped(KeyEvent event) {
         letter = event.getKeyChar();
         
-        if (isKeyPressed()) {
+        if (isKeyTyped()) {
             lines.get(cursor.y).add(cursor.x, letter);
             cursor.x++;
-            
             System.out.print(letter);
             cursor.printLineAfterCursor(lines.get(cursor.y));
         }
     }
 
-    public boolean isKeyPressed() {
-        return (Character.isLetterOrDigit(letter)
+    public boolean isKeyTyped() {
+        boolean isKeyTyped =
+        (Character.isLetterOrDigit(letter)
         || String.valueOf(letter).matches(SYMBOLS_REGEX))
         && lines.get(cursor.y).size() < screenWidth
         && !cursorMode && !altPressed && !shiftPressed && !ctrlPressed;
+        
+        return isKeyTyped;
     }
 
     @Override
@@ -238,7 +255,6 @@ class Key implements KeyListener {
         
         System.out.print(action);
         cursor.clearScreenAfterCursor();
-
         cursor.savePosition();
 
         for (int i = cursor.y; i < lines.size(); i++) {
