@@ -28,7 +28,7 @@ public class FileManager {
         }
     }
 
-    public void readFile() {
+    private void readFile() {
         try {
             Scanner fscan = new Scanner(file);
             String data;

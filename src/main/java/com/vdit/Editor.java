@@ -11,31 +11,31 @@ import org.jline.reader.LineReaderBuilder;
 import org.jline.reader.impl.DefaultParser;
 
 class Editor implements KeyListener {
-    ArrayList<ArrayList<Character>> lines = new ArrayList<>();
-    HotKeys hotKeys = new HotKeys();
-    Cursor cursor = new Cursor();
-    FileManager fileManager;
-    Terminal terminal;
-    LineReader lineReader;
+    private ArrayList<ArrayList<Character>> lines = new ArrayList<>();
+    private HotKeys hotKeys = new HotKeys();
+    private Cursor cursor = new Cursor();
+    private FileManager fileManager;
+    private Terminal terminal;
+    private LineReader lineReader;
     
-    int winHeight = 0;
-    int winWidth = 0;
-    int scroll = 0;
-    char action;
-    char letter;
-    String path = "";
+    private int winHeight = 0;
+    private int winWidth = 0;
+    private int scroll = 0;
+    private char action;
+    private char letter;
+    private String path = "";
 
-    boolean cursorMode = false;
-    boolean altPressed = false;
-    boolean shiftPressed = false;
-    boolean ctrlPressed = false;
+    private boolean cursorMode = false;
+    private boolean altPressed = false;
+    private boolean shiftPressed = false;
+    private boolean ctrlPressed = false;
+    private boolean loop = true;
     
-    final char EMPTY_SPACE = ' ';
-    final String SYMBOLS_REGEX = "[ .,:;_+-/\\*!\"'%$&@#~|()=¿?<>{}\\[\\]]";
+    private final char EMPTY_SPACE = ' ';
+    private final String SYMBOLS_REGEX = "[ .,:;_+-/\\*!\"'%$&@#~|()=¿?<>{}\\[\\]]";
 
     public Editor(String fileName) {
         fileManager = new FileManager(fileName, lines);
-        clearCommand();
 
         if (fileName != null) {
             fileManager.openFile();
@@ -59,6 +59,7 @@ class Editor implements KeyListener {
     }
 
     public void start() {
+        clearScreen();
         try {
             terminal = TerminalBuilder.builder().build();
             lineReader = LineReaderBuilder
@@ -66,10 +67,9 @@ class Editor implements KeyListener {
                         .terminal(terminal)
                         .parser(new DefaultParser())
                         .build();
-
             terminal.enterRawMode();
-            while (true) {
-                String line;
+
+            while (loop) {
                 if (windowResized()) {
                     winHeight = terminal.getHeight();
                     winWidth = terminal.getWidth();
@@ -77,7 +77,7 @@ class Editor implements KeyListener {
                 }
                 
                 // try {
-                //     line = lineReader.readLine();
+                //     String line = lineReader.readLine();
                 //     if (line.equals("q")) {
                 //         terminal.resume();
                 //         terminal.close();
@@ -90,14 +90,11 @@ class Editor implements KeyListener {
         catch (IOException e) {
             e.printStackTrace();
         }
-
     }
 
-    public boolean windowResized() {
-        return (
-            winHeight != terminal.getHeight()
-            || winWidth != terminal.getWidth()
-        );
+    private boolean windowResized() {
+        return winHeight != terminal.getHeight()
+            || winWidth != terminal.getWidth();
     }
 
     @Override
@@ -112,7 +109,7 @@ class Editor implements KeyListener {
         }
     }
 
-    public boolean isKeyTyped() {
+    private boolean isKeyTyped() {
         boolean isKeyTyped =
         (Character.isLetterOrDigit(letter)
         || String.valueOf(letter).matches(SYMBOLS_REGEX))
@@ -196,7 +193,7 @@ class Editor implements KeyListener {
         handleCtrlShift(event);
     }
 
-    public void handleCtrl(KeyEvent event) {
+    private void handleCtrl(KeyEvent event) {
         if (ctrlPressed && !shiftPressed) {
             switch (event.getKeyCode()) {
                 case KeyEvent.VK_C:
@@ -213,7 +210,7 @@ class Editor implements KeyListener {
         }
     }
 
-    public void handleCtrlShift(KeyEvent event) {
+    private void handleCtrlShift(KeyEvent event) {
         if (ctrlPressed && shiftPressed) {
             switch (event.getKeyCode()) {
                 default:
@@ -252,13 +249,13 @@ class Editor implements KeyListener {
 
     // NEW LINE
 
-    public void newLine() {
+    private void newLine() {
         lines.add(cursor.y + 1, new ArrayList<>());
         splitCurrentLine();
         printNewLine();
     }
 
-    public void splitCurrentLine() {
+    private void splitCurrentLine() {
         int size = lines.get(cursor.y).size();
         int newLine = cursor.y + 1;
         if (cursor.x < size) {
@@ -271,7 +268,7 @@ class Editor implements KeyListener {
         }
     }
 
-    public void printNewLine() {
+    private void printNewLine() {
         cursor.y++;
         cursor.x = 0;
         
@@ -293,7 +290,7 @@ class Editor implements KeyListener {
 
     // BACK SPACE
 
-    public void backSpace() {
+    private void backSpace() {
         if (cursor.x > 0) {
             cursor.x--;
             lines.get(cursor.y).remove(cursor.x);
@@ -308,7 +305,7 @@ class Editor implements KeyListener {
 
     // TABULATION
 
-    public void tabulate() {
+    private void tabulate() {
         for (int i = 0; i < 4; i++) {
             lines.get(cursor.y).add(cursor.x, EMPTY_SPACE);
             cursor.x++;
@@ -318,12 +315,12 @@ class Editor implements KeyListener {
         cursor.printLineAfterCursor(lines.get(cursor.y));
     }
 
-    public void reverseTab() {}
+    private void reverseTab() {}
 
 
     // TOGGLE CURSOR MODE
 
-    public void toggleCursorMode() {
+    private void toggleCursorMode() {
         if (altPressed) {
             if (cursorMode) {
                 cursorMode = false;
@@ -339,7 +336,7 @@ class Editor implements KeyListener {
 
     // COMMANDS
 
-    public static void clearCommand() {
+    private static void clearScreen() {
         try {
             ProcessBuilder clear = new ProcessBuilder("bash", "-c", "clear").inheritIO();
             clear.start().waitFor();

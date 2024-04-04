@@ -5,8 +5,7 @@ public class Main {
         String fileName;
         if (args.length > 0) fileName = args[0];
         else fileName = null;
-        
-        Editor key = new Editor(fileName);
-        key.start();
+        Editor editor = new Editor(fileName);
+        editor.start();
     }
 }
