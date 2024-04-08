@@ -8,8 +8,14 @@ import org.jline.utils.NonBlockingReader;
 public class TerminalManager {
     private Terminal terminal;
     private NonBlockingReader reader;
+    public boolean loop = true;
     public int width = 0;
     public int height = 0;
+    public Thread checkSize = new Thread(() -> {
+        while (loop) {
+            checkForResize();
+        }
+    });
 
     public TerminalManager() {
         try {
@@ -25,7 +31,7 @@ public class TerminalManager {
 
     // KEYS
 
-    public void readKeys() {
+    public char readKeys() {
         int key = 0;
         try {
             key = reader.read();
@@ -34,16 +40,13 @@ public class TerminalManager {
             e.printStackTrace();
         }
 
-        System.out.print((char) key);
-        // if (key == 'q') {
-        //     break;
-        // }
+        return (char) key;
     }
 
 
     // SCREEN
 
-    public void checkSize() {
+    public void checkForResize() {
         if (windowResized()) {
             height = terminal.getHeight();
             width = terminal.getWidth();

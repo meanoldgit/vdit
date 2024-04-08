@@ -50,9 +50,24 @@ class Editor implements KeyListener {
     }
 
     public void start() {
+        char key;
+        terminal.checkSize.start();
+        
         while (loop) {
-            terminal.checkSize();
-            terminal.readKeys();
+            key = terminal.readKeys();
+            System.out.print(key);
+            if (key == 'q') {
+                loop = false;
+            }
+        }
+
+        terminal.loop = false;
+        ProcessBuilder pb = new ProcessBuilder("bash", "-c", "stty sane").inheritIO();
+        try {
+            pb.start().waitFor();
+        }
+        catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
