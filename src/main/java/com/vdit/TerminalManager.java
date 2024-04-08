@@ -2,31 +2,46 @@ package com.vdit;
 
 import java.io.IOException;
 import org.jline.terminal.Terminal;
-import org.jline.reader.LineReader;
-import org.jline.reader.LineReaderBuilder;
-import org.jline.reader.impl.DefaultParser;
 import org.jline.terminal.TerminalBuilder;
+import org.jline.utils.NonBlockingReader;
 
 public class TerminalManager {
-    Terminal terminal;
-    LineReader lineReader;
-    int width = 0;
-    int height = 0;
+    private Terminal terminal;
+    private NonBlockingReader reader;
+    public int width = 0;
+    public int height = 0;
 
     public TerminalManager() {
         try {
             terminal = TerminalBuilder.builder().build();
-            lineReader = LineReaderBuilder
-                        .builder()
-                        .terminal(terminal)
-                        .parser(new DefaultParser())
-                        .build();
+            reader = terminal.reader();
             terminal.enterRawMode();
         }
         catch (IOException e) {
             e.printStackTrace();
         }
     }
+
+
+    // KEYS
+
+    public void readKeys() {
+        int key = 0;
+        try {
+            key = reader.read();
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        System.out.print((char) key);
+        // if (key == 'q') {
+        //     break;
+        // }
+    }
+
+
+    // SCREEN
 
     public void checkSize() {
         if (windowResized()) {

@@ -52,6 +52,7 @@ class Editor implements KeyListener {
     public void start() {
         while (loop) {
             terminal.checkSize();
+            terminal.readKeys();
         }
     }
 
