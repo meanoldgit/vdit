@@ -45,7 +45,7 @@ class Editor implements KeyListener {
             lines.add(new ArrayList<>());
         }
         
-        clearScreen();
+        terminal.clearScreen();
         // TODO: Remove all '\n' when opening file.
     }
 
@@ -287,19 +287,6 @@ class Editor implements KeyListener {
                 cursorMode = true;
                 cursor.changeColorRed();
             }
-        }
-    }
-
-
-    // COMMANDS
-
-    private static void clearScreen() {
-        try {
-            ProcessBuilder clear = new ProcessBuilder("bash", "-c", "clear").inheritIO();
-            clear.start().waitFor();
-        }
-        catch (Exception e) {
-            e.printStackTrace();
         }
     }
 }

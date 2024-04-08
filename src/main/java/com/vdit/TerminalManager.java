@@ -40,4 +40,14 @@ public class TerminalManager {
         return height != terminal.getHeight()
             || width != terminal.getWidth();
     }
+
+    public void clearScreen() {
+        try {
+            ProcessBuilder clear = new ProcessBuilder("bash", "-c", "clear").inheritIO();
+            clear.start().waitFor();
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 }
