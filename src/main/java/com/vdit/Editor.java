@@ -2,24 +2,15 @@ package com.vdit;
 
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.io.IOException;
 import java.util.ArrayList;
-import org.jline.terminal.Terminal;
-import org.jline.terminal.TerminalBuilder;
-import org.jline.reader.LineReader;
-import org.jline.reader.LineReaderBuilder;
-import org.jline.reader.impl.DefaultParser;
 
 class Editor implements KeyListener {
     private ArrayList<ArrayList<Character>> lines = new ArrayList<>();
+    private TerminalManager terminal = new TerminalManager();
     private HotKeys hotKeys = new HotKeys();
     private Cursor cursor = new Cursor();
     private FileManager fileManager;
-    private Terminal terminal;
-    private LineReader lineReader;
     
-    private int winHeight = 0;
-    private int winWidth = 0;
     private int scroll = 0;
     private char action;
     private char letter;
@@ -41,11 +32,10 @@ class Editor implements KeyListener {
             fileManager.openFile();
             cursor.savePosition();
             
-            for (int i = 0; i < winHeight && i < lines.size(); i++) {
+            for (int i = 0; i < terminal.height && i < lines.size(); i++) {
                 for (int j = 0; j < lines.get(i).size(); j++) {
                     System.out.print(lines.get(i).get(j));
                 }
-
                 System.out.println();
             }
 
@@ -54,47 +44,15 @@ class Editor implements KeyListener {
         else {
             lines.add(new ArrayList<>());
         }
-
+        
+        clearScreen();
         // TODO: Remove all '\n' when opening file.
     }
 
     public void start() {
-        clearScreen();
-        try {
-            terminal = TerminalBuilder.builder().build();
-            lineReader = LineReaderBuilder
-                        .builder()
-                        .terminal(terminal)
-                        .parser(new DefaultParser())
-                        .build();
-            terminal.enterRawMode();
-
-            while (loop) {
-                if (windowResized()) {
-                    winHeight = terminal.getHeight();
-                    winWidth = terminal.getWidth();
-                    System.out.println(winWidth + "x" + winHeight);
-                }
-                
-                // try {
-                //     String line = lineReader.readLine();
-                //     if (line.equals("q")) {
-                //         terminal.resume();
-                //         terminal.close();
-                //         System.exit(0);
-                //     }
-                // }
-                // catch (UserInterruptException e) {}
-            }
+        while (loop) {
+            terminal.checkSize();
         }
-        catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private boolean windowResized() {
-        return winHeight != terminal.getHeight()
-            || winWidth != terminal.getWidth();
     }
 
     @Override
@@ -113,7 +71,6 @@ class Editor implements KeyListener {
         boolean isKeyTyped =
         (Character.isLetterOrDigit(letter)
         || String.valueOf(letter).matches(SYMBOLS_REGEX))
-        && lines.get(cursor.y).size() < winWidth
         && !cursorMode && !altPressed && !shiftPressed && !ctrlPressed;
         
         return isKeyTyped;
