@@ -54,8 +54,8 @@ class Editor implements KeyListener {
         
         while (loop) {
             key = terminal.readKeys();
-            System.out.print(key);
-            if (key == 'q') {
+            System.out.print((int) key);
+            if ( key == hotKeys.ctrlK) {
                 loop = false;
             }
         }

@@ -14,7 +14,7 @@ public class TerminalManager {
     
     public Thread checkSizeThread = new Thread(() -> {
         while (loop) {
-            checkForResize();
+            handleResize();
         }
     });
 
@@ -48,7 +48,7 @@ public class TerminalManager {
 
     // SCREEN
 
-    private void checkForResize() {
+    private void handleResize() {
         if (windowResized()) {
             height = terminal.getHeight();
             width = terminal.getWidth();
