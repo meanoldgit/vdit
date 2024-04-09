@@ -7,11 +7,12 @@ import org.jline.utils.NonBlockingReader;
 
 public class TerminalManager {
     private Terminal terminal;
-    private NonBlockingReader reader;
+    private NonBlockingReader keyReader;
     public boolean loop = true;
     public int width = 0;
     public int height = 0;
-    public Thread checkSize = new Thread(() -> {
+    
+    public Thread checkSizeThread = new Thread(() -> {
         while (loop) {
             checkForResize();
         }
@@ -19,9 +20,10 @@ public class TerminalManager {
 
     public TerminalManager() {
         try {
-            terminal = TerminalBuilder.builder().build();
-            reader = terminal.reader();
+            terminal = TerminalBuilder.builder().system(true).build();
+            keyReader = terminal.reader();
             terminal.enterRawMode();
+            checkSizeThread.start();
         }
         catch (IOException e) {
             e.printStackTrace();
@@ -34,7 +36,7 @@ public class TerminalManager {
     public char readKeys() {
         int key = 0;
         try {
-            key = reader.read();
+            key = keyReader.read();
         }
         catch (IOException e) {
             e.printStackTrace();
@@ -46,11 +48,11 @@ public class TerminalManager {
 
     // SCREEN
 
-    public void checkForResize() {
+    private void checkForResize() {
         if (windowResized()) {
             height = terminal.getHeight();
             width = terminal.getWidth();
-            System.out.println(width + "x" + height);
+            System.out.println(width + "x" + height); // TODO: remove
         }
     }
 
@@ -59,10 +61,10 @@ public class TerminalManager {
             || width != terminal.getWidth();
     }
 
-    public void clearScreen() {
+    public void command(String str) {
+        ProcessBuilder command = new ProcessBuilder("bash", "-c", str).inheritIO();
         try {
-            ProcessBuilder clear = new ProcessBuilder("bash", "-c", "clear").inheritIO();
-            clear.start().waitFor();
+            command.start().waitFor();
         }
         catch (Exception e) {
             e.printStackTrace();

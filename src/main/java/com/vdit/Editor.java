@@ -14,7 +14,6 @@ class Editor implements KeyListener {
     private int scroll = 0;
     private char action;
     private char letter;
-    private String path = "";
 
     private boolean cursorMode = false;
     private boolean altPressed = false;
@@ -32,7 +31,7 @@ class Editor implements KeyListener {
             fileManager.openFile();
             cursor.savePosition();
             
-            for (int i = 0; i < terminal.height && i < lines.size(); i++) {
+            for (int i = scroll; i < terminal.height && i < lines.size(); i++) {
                 for (int j = 0; j < lines.get(i).size(); j++) {
                     System.out.print(lines.get(i).get(j));
                 }
@@ -45,13 +44,13 @@ class Editor implements KeyListener {
             lines.add(new ArrayList<>());
         }
         
-        terminal.clearScreen();
+        terminal.command("clear");
+        System.out.println(terminal.width + "x" + terminal.height);
         // TODO: Remove all '\n' when opening file.
     }
 
     public void start() {
         char key;
-        terminal.checkSize.start();
         
         while (loop) {
             key = terminal.readKeys();
@@ -62,14 +61,10 @@ class Editor implements KeyListener {
         }
 
         terminal.loop = false;
-        ProcessBuilder pb = new ProcessBuilder("bash", "-c", "stty sane").inheritIO();
-        try {
-            pb.start().waitFor();
-        }
-        catch (Exception e) {
-            e.printStackTrace();
-        }
+        terminal.command("stty sane");
     }
+
+    
 
     @Override
     public void keyTyped(KeyEvent event) {
