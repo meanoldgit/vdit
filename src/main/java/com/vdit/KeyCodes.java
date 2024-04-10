@@ -1,9 +1,6 @@
 package com.vdit;
 
 class KeyCodes {
-    public static final int ALT = 27;
-    public static final int BACKSPACE = 127;
-
     public static final int CTRL_A = 1;
     public static final int CTRL_B = 2;
     public static final int CTRL_C = 3;
@@ -62,32 +59,39 @@ class KeyCodes {
     public static final int SHIFT_Y = 89;
     public static final int SHIFT_Z = 90;
 
-    public static final int ALT_A = 97;
-    public static final int ALT_B = 98;
-    public static final int ALT_C = 99;
-    public static final int ALT_D = 100;
-    public static final int ALT_E = 101;
-    public static final int ALT_F = 102;
-    public static final int ALT_G = 103;
-    public static final int ALT_H = 104;
-    public static final int ALT_I = 105;
-    public static final int ALT_J = 106;
-    public static final int ALT_K = 107;
-    public static final int ALT_L = 108;
-    public static final int ALT_M = 109;
-    public static final int ALT_N = 110;
-    public static final int ALT_O = 111;
-    public static final int ALT_P = 112;
-    public static final int ALT_Q = 113;
-    public static final int ALT_R = 114;
-    public static final int ALT_S = 115;
-    public static final int ALT_T = 116;
-    public static final int ALT_U = 117;
-    public static final int ALT_V = 118;
-    public static final int ALT_W = 119;
-    public static final int ALT_X = 120;
-    public static final int ALT_Y = 121;
-    public static final int ALT_Z = 122;
+    public static final int A = 97;
+    public static final int B = 98;
+    public static final int C = 99;
+    public static final int D = 100;
+    public static final int E = 101;
+    public static final int F = 102;
+    public static final int G = 103;
+    public static final int H = 104;
+    public static final int I = 105;
+    public static final int J = 106;
+    public static final int K = 107;
+    public static final int L = 108;
+    public static final int M = 109;
+    public static final int N = 110;
+    public static final int O = 111;
+    public static final int P = 112;
+    public static final int Q = 113;
+    public static final int R = 114;
+    public static final int S = 115;
+    public static final int T = 116;
+    public static final int U = 117;
+    public static final int V = 118;
+    public static final int W = 119;
+    public static final int X = 120;
+    public static final int Y = 121;
+    public static final int Z = 122;
+
+    public static final int ESC = 27;
+    public static final int ALT = 27;
+    public static final int SQR_BRKT = 91; // '['
+    public static final int BACKTAB = 90; // 'Z'
+    public static final int BACKSPACE = 127;
+    public static final int[] BACKTAB_SEQ = {ESC, SQR_BRKT, BACKTAB};
 
 
     // public void close(ArrayList<ArrayList<Character>> lines) {

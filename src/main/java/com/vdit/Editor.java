@@ -50,6 +50,9 @@ class Editor {
         char key;
         int keyCode;
         boolean isAltPressed = false;
+        // System.out.print(" ".repeat(10));
+        // System.out.print("\033[Z");
+        System.out.print((char)27);
         
         while (loop) {
             key = terminal.readKeys();
@@ -62,7 +65,7 @@ class Editor {
             // if (key != '[')
             // System.out.print(key);
             System.out.println(keyCode);
-            if (isAltPressed && keyCode == KeyCodes.ALT_X) {
+            if (isAltPressed && keyCode == KeyCodes.X) {
                 loop = false;
             }
 
@@ -106,11 +109,11 @@ class Editor {
         action = key;
         
         switch (code) {
-            case KeyCodes.ALT_M:
+            case KeyCodes.M:
             newLine();
             break;
 
-            case KeyCodes.ALT_J:
+            case KeyCodes.J:
             tabulate();
             break;
 
@@ -229,7 +232,7 @@ class Editor {
         cursor.printLineAfterCursor(lines.get(cursor.y));
     }
 
-    private void reverseTab() {}
+    private void backTab() {}
 
 
     // TOGGLE CURSOR MODE
