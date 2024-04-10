@@ -8,9 +8,9 @@ import org.jline.utils.NonBlockingReader;
 public class TerminalManager {
     private Terminal terminal;
     private NonBlockingReader keyReader;
-    public boolean loop = true;
-    public int width = 0;
-    public int height = 0;
+    private boolean loop = true;
+    private int width = 0;
+    private int height = 0;
     
     public Thread checkSizeThread = new Thread(() -> {
         while (loop) {
@@ -60,6 +60,21 @@ public class TerminalManager {
         return height != terminal.getHeight()
             || width != terminal.getWidth();
     }
+
+    public int getWidth() {
+        return width;
+    }
+
+    public int getHeight() {
+        return height;
+    }
+
+    public void stopThread() {
+        loop = false;
+    }
+
+
+    // COMMAND
 
     public void command(String str) {
         ProcessBuilder command = new ProcessBuilder("bash", "-c", str).inheritIO();

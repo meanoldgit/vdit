@@ -30,7 +30,7 @@ class Editor implements KeyListener {
             fileManager.openFile();
             cursor.savePosition();
             
-            for (int i = scroll; i < terminal.height && i < lines.size(); i++) {
+            for (int i = scroll; i < terminal.getHeight() && i < lines.size(); i++) {
                 for (int j = 0; j < lines.get(i).size(); j++) {
                     System.out.print(lines.get(i).get(j));
                 }
@@ -44,25 +44,32 @@ class Editor implements KeyListener {
         }
         
         terminal.command("clear");
-        System.out.println(terminal.width + "x" + terminal.height);
+        System.out.println(terminal.getWidth() + "x" + terminal.getHeight());
         // TODO: Remove all '\n' when opening file.
     }
 
     public void start() {
         char key;
+        int keyCode;
+        boolean isAltPressed = false;
         
         while (loop) {
             key = terminal.readKeys();
-            int intKey = (int) key;
-            // System.out.print(key);
-            // System.out.print("altX value:");
-            System.out.print(intKey);
-            if (intKey == KeyCodes.altX) {
-                // System.out.println("x");
+            keyCode = (int) key;
+
+            if (keyCode == KeyCodes.ALT) {
+                isAltPressed = true;
+            }
+            
+            // if (key != '[')
+            System.out.print(key);
+            // System.out.print(keyCode);
+            if (isAltPressed && keyCode == KeyCodes.ALT_X) {
+                loop = false;
             }
 
-            switch ((int) key) {
-                case KeyCodes.backSpace:
+            switch (keyCode) {
+                case KeyCodes.BACKSPACE:
                     // backSpace();
                     break;
             
@@ -71,7 +78,7 @@ class Editor implements KeyListener {
             }
         }
 
-        terminal.loop = false;
+        terminal.stopThread();
         terminal.command("stty sane");
     }
 
