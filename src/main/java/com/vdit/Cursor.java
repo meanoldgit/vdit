@@ -5,17 +5,17 @@ public class Cursor {
     int x = 0;
     int y = 0;
 
-    final char EMPTY_SPACE = ' ';
-    final String CURSOR_UP = "\033[A";
-    final String CURSOR_DOWN = "\033[B";
-    final String CURSOR_FORWARD = "\033[C";
-    final String CURSOR_BACKWARD = "\033[D";
-    final String SAVE_CURSOR_POSITION = "\033[s";
-    final String RESTORE_CURSOR_POSITION = "\033[u";
-    final String CLEAR_LINE_AFTER_CURSOR = "\033[K";
-    final String CLEAR_SCREEN_AFTER_CURSOR = "\033[J";
-    final String CURSOR_COLOR_RED = "\033]12;red\007";
-    final String CURSOR_COLOR_WHITE = "\033]12;white\007";
+    private final char EMPTY_SPACE = ' ';
+    private final String CURSOR_UP = "\033[A";
+    private final String CURSOR_DOWN = "\033[B";
+    private final String CURSOR_FORWARD = "\033[C";
+    private final String CURSOR_BACKWARD = "\033[D";
+    private final String SAVE_CURSOR_POSITION = "\033[s";
+    private final String RESTORE_CURSOR_POSITION = "\033[u";
+    // private final String CLEAR_LINE_AFTER_CURSOR = "\033[K";
+    private final String CLEAR_SCREEN_AFTER_CURSOR = "\033[J";
+    private final String CURSOR_COLOR_RED = "\033]12;red\007";
+    private final String CURSOR_COLOR_WHITE = "\033]12;white\007";
 
     private void action(String action) {
         System.out.print(action);

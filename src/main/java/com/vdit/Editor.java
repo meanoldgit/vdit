@@ -7,7 +7,6 @@ import java.util.ArrayList;
 class Editor implements KeyListener {
     private ArrayList<ArrayList<Character>> lines = new ArrayList<>();
     private TerminalManager terminal = new TerminalManager();
-    private HotKeys hotKeys = new HotKeys();
     private Cursor cursor = new Cursor();
     private FileManager fileManager;
     
@@ -54,9 +53,21 @@ class Editor implements KeyListener {
         
         while (loop) {
             key = terminal.readKeys();
-            System.out.print((int) key);
-            if ( key == hotKeys.ctrlK) {
-                loop = false;
+            int intKey = (int) key;
+            // System.out.print(key);
+            // System.out.print("altX value:");
+            System.out.print(intKey);
+            if (intKey == KeyCodes.altX) {
+                // System.out.println("x");
+            }
+
+            switch ((int) key) {
+                case KeyCodes.backSpace:
+                    // backSpace();
+                    break;
+            
+                default:
+                    break;
             }
         }
 
@@ -165,7 +176,7 @@ class Editor implements KeyListener {
         if (ctrlPressed && !shiftPressed) {
             switch (event.getKeyCode()) {
                 case KeyEvent.VK_C:
-                hotKeys.close(lines);
+                // keyCodes.close(lines);
                 break;
 
                 case KeyEvent.VK_S:
