@@ -1,10 +1,8 @@
 package com.vdit;
 
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 import java.util.ArrayList;
 
-class Editor implements KeyListener {
+class Editor {
     private ArrayList<ArrayList<Character>> lines = new ArrayList<>();
     private TerminalManager terminal = new TerminalManager();
     private Cursor cursor = new Cursor();
@@ -62,8 +60,8 @@ class Editor implements KeyListener {
             }
             
             // if (key != '[')
-            System.out.print(key);
-            // System.out.print(keyCode);
+            // System.out.print(key);
+            System.out.println(keyCode);
             if (isAltPressed && keyCode == KeyCodes.ALT_X) {
                 loop = false;
             }
@@ -84,9 +82,8 @@ class Editor implements KeyListener {
 
     
 
-    @Override
-    public void keyTyped(KeyEvent event) {
-        letter = event.getKeyChar();
+    public void keyTyped(char key) {
+        letter = key;
         
         if (isKeyTyped()) {
             lines.get(cursor.y).add(cursor.x, letter);
@@ -105,37 +102,24 @@ class Editor implements KeyListener {
         return isKeyTyped;
     }
 
-    @Override
-    public void keyPressed(KeyEvent event) {
-        action = event.getKeyChar();
+    public void keyPressed(char key, int code) {
+        action = key;
         
-        switch (event.getKeyCode()) {
-            case KeyEvent.VK_ENTER:
+        switch (code) {
+            case KeyCodes.ALT_M:
             newLine();
             break;
 
-            case KeyEvent.VK_TAB:
+            case KeyCodes.ALT_J:
             tabulate();
             break;
 
-            case KeyEvent.VK_CONTROL:
-            ctrlPressed = true;
-            break;
-
-            case KeyEvent.VK_ALT:
-            altPressed = true;
-            break;
-
-            case KeyEvent.VK_SHIFT:
-            shiftPressed = true;
-            break;
-
-            case KeyEvent.VK_BACK_SPACE:
+            case KeyCodes.BACKSPACE:
             backSpace();
             break;
 
             // MOVE KEYS
-            case KeyEvent.VK_J:
+            case KeyCodes.CTRL_J:
             if (cursorMode || (!cursorMode && ctrlPressed)) {
                 if (cursorMode && ctrlPressed) {
                     cursor.jumpBackward(lines.get(cursor.y));
@@ -146,7 +130,7 @@ class Editor implements KeyListener {
             }
             break;
 
-            case KeyEvent.VK_L:
+            case KeyCodes.CTRL_L:
             if (cursorMode || (!cursorMode && ctrlPressed)) {
                 if (cursorMode && ctrlPressed) {
                     cursor.jumpForward(lines.get(cursor.y));
@@ -157,7 +141,7 @@ class Editor implements KeyListener {
             }
             break;
 
-            case KeyEvent.VK_K:
+            case KeyCodes.CTRL_K:
             toggleCursorMode();
 
             if (cursorMode || (!cursorMode && ctrlPressed)) {
@@ -165,68 +149,12 @@ class Editor implements KeyListener {
             }
             break;
 
-            case KeyEvent.VK_I:
+            case KeyCodes.CTRL_I:
             if (cursorMode || (!cursorMode && ctrlPressed)) {
                 cursor.up();
             }
             break;
 
-            default:
-            break;
-        }
-
-        handleCtrl(event);
-        handleCtrlShift(event);
-    }
-
-    private void handleCtrl(KeyEvent event) {
-        if (ctrlPressed && !shiftPressed) {
-            switch (event.getKeyCode()) {
-                case KeyEvent.VK_C:
-                // keyCodes.close(lines);
-                break;
-
-                case KeyEvent.VK_S:
-                fileManager.writeFile();
-                break;
-
-                default:
-                break;
-            }
-        }
-    }
-
-    private void handleCtrlShift(KeyEvent event) {
-        if (ctrlPressed && shiftPressed) {
-            switch (event.getKeyCode()) {
-                default:
-                break;
-            }
-        }
-    }
-
-    @Override
-    public void keyReleased(KeyEvent event) {
-        switch (event.getKeyCode()) {
-            case KeyEvent.VK_E:
-            if (cursorMode) {
-                cursorMode = false;
-                cursor.changeColorWhite();
-            }
-            break;
-
-            case KeyEvent.VK_CONTROL:
-            ctrlPressed = false;
-            break;
-
-            case KeyEvent.VK_ALT:
-            altPressed = false;
-            break;
-
-            case KeyEvent.VK_SHIFT:
-            shiftPressed = false;
-            break;
-            
             default:
             break;
         }
