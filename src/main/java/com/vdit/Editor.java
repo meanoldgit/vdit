@@ -50,23 +50,24 @@ class Editor {
         char key;
         int keyCode;
         boolean isAltPressed = false;
-        // System.out.print(" ".repeat(10));
-        // System.out.print("\033[Z");
-        System.out.print((char)27);
+        terminal.command("stty");
         
         while (loop) {
-            key = terminal.readKeys();
-            keyCode = (int) key;
+            keyCode = terminal.readKeys();
+            key = (char) keyCode;
 
             if (keyCode == KeyCodes.ALT) {
                 isAltPressed = true;
             }
             
             // if (key != '[')
-            // System.out.print(key);
-            System.out.println(keyCode);
-            if (isAltPressed && keyCode == KeyCodes.X) {
+            System.out.print(key);
+            // System.out.println(keyCode);
+            if (keyCode == KeyCodes.CTRL_C) {
                 loop = false;
+            }
+
+            if (isAltPressed) {
             }
 
             switch (keyCode) {
@@ -79,8 +80,7 @@ class Editor {
             }
         }
 
-        terminal.stopThread();
-        terminal.command("stty sane");
+        terminal.close();
     }
 
     

@@ -11,10 +11,18 @@ public class TerminalManager {
     private boolean loop = true;
     private int width = 0;
     private int height = 0;
+    private final String disableInterruptSignals = "stty intr undef susp undef eof undef";
+    private final String resetTerminalSettings = "stty sane -brkint -imaxbel";
     
-    public Thread checkSizeThread = new Thread(() -> {
+    private Thread checkSizeThread = new Thread(() -> {
         while (loop) {
             handleResize();
+            try {
+                Thread.sleep(500);
+            }
+            catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
     });
 
@@ -24,6 +32,7 @@ public class TerminalManager {
             keyReader = terminal.reader();
             terminal.enterRawMode();
             checkSizeThread.start();
+            command(disableInterruptSignals);
         }
         catch (IOException e) {
             e.printStackTrace();
@@ -33,7 +42,7 @@ public class TerminalManager {
 
     // KEYS
 
-    public char readKeys() {
+    public int readKeys() {
         int key = 0;
         try {
             key = keyReader.read();
@@ -42,7 +51,7 @@ public class TerminalManager {
             e.printStackTrace();
         }
 
-        return (char) key;
+        return key;
     }
 
 
@@ -69,12 +78,8 @@ public class TerminalManager {
         return height;
     }
 
-    public void stopThread() {
-        loop = false;
-    }
 
-
-    // COMMAND
+    // COMMANDS
 
     public void command(String str) {
         ProcessBuilder command = new ProcessBuilder("bash", "-c", str).inheritIO();
@@ -82,6 +87,17 @@ public class TerminalManager {
             command.start().waitFor();
         }
         catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void close() {
+        loop = false;
+        command(resetTerminalSettings);
+        try {
+            terminal.close();
+        }
+        catch (IOException e) {
             e.printStackTrace();
         }
     }
