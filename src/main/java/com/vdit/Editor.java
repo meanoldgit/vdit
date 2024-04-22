@@ -17,14 +17,18 @@ class Editor {
     private boolean shiftPressed = false;
     private boolean ctrlPressed = false;
     private boolean loop = true;
+    private boolean beginEscapeSequence = false;
+
+    char key;
+    int keyCode;
     
     private final char EMPTY_SPACE = ' ';
     private final String SYMBOLS_REGEX = "[ .,:;_+-/\\*!\"'%$&@#~|()=¿?<>{}\\[\\]]";
 
-    public Editor(String fileName) {
-        fileManager = new FileManager(fileName, lines);
+    public Editor(String files) {
+        fileManager = new FileManager(files, lines);
 
-        if (fileName != null) {
+        if (files != null) {
             fileManager.openFile();
             cursor.savePosition();
             
@@ -47,31 +51,29 @@ class Editor {
     }
 
     public void start() {
-        char key;
-        int keyCode;
-        boolean isAltPressed = false;
-        terminal.command("stty");
-        
         while (loop) {
             keyCode = terminal.readKeys();
             key = (char) keyCode;
-
-            if (keyCode == KeyCodes.ALT) {
-                isAltPressed = true;
-            }
-            
-            // if (key != '[')
             System.out.print(key);
             // System.out.println(keyCode);
-            if (keyCode == KeyCodes.CTRL_C) {
-                loop = false;
-            }
+            checkCode();
+        }
 
-            if (isAltPressed) {
-            }
+        terminal.close();
+    }
 
+    private void checkCode() {
+        if (keyCode == KeyCodes.CTRL_C) {
+            loop = false;
+        }
+
+        if (keyCode == KeyCodes.ESC) {
+            beginEscapeSequence = true;
+        }
+
+        if (beginEscapeSequence) {
             switch (keyCode) {
-                case KeyCodes.BACKSPACE:
+                case KeyCodes.SQR_BRKT:
                     // backSpace();
                     break;
             
@@ -79,13 +81,9 @@ class Editor {
                     break;
             }
         }
-
-        terminal.close();
     }
 
-    
-
-    public void keyTyped(char key) {
+    private void keyTyped(char key) {
         letter = key;
         
         if (isKeyTyped()) {
@@ -105,7 +103,7 @@ class Editor {
         return isKeyTyped;
     }
 
-    public void keyPressed(char key, int code) {
+    private void keyPressed(char key, int code) {
         action = key;
         
         switch (code) {

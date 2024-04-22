@@ -2,17 +2,21 @@ package com.vdit;
 
 public class Main {
     public static void main(String[] args) {
-        String fileName;
-        // TODO: make fileName an array to support multiple arguments
-        if (args.length > 0) {
-            fileName = args[0];
-            // for x in args files.add x
+        int length = args.length;
+        String[] files;
+        
+        if (length > 0) {
+            files = new String[length];
+            for (int i = 0; i < length; i++) {
+                files[i] = args[i];
+            }
         }
         else {
-            fileName = null;
+            files = new String[1];
+            files[0] = null;
         }
 
-        Editor editor = new Editor(fileName);
+        Editor editor = new Editor(files[0]);
         editor.start();
     }
 }
