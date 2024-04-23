@@ -10,13 +10,14 @@ public class FileManager {
     File file;
     String fileName;
     ArrayList<ArrayList<Character>> lines;
+    ArrayList<ArrayList<ArrayList<Character>>> files = new ArrayList<>();
 
     public FileManager(String fileName, ArrayList<ArrayList<Character>> lines) {
         this.fileName = fileName;
         this.lines = lines;
     }
 
-    public void openFile() {
+    public void openFiles() {
         file = new File(fileName);
 
         if (file.exists()) {

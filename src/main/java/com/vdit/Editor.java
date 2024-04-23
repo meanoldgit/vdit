@@ -13,9 +13,6 @@ class Editor {
     private char letter;
 
     private boolean cursorMode = false;
-    private boolean altPressed = false;
-    private boolean shiftPressed = false;
-    private boolean ctrlPressed = false;
     private boolean loop = true;
     private boolean beginEscapeSequence = false;
 
@@ -29,17 +26,7 @@ class Editor {
         fileManager = new FileManager(files, lines);
 
         if (files != null) {
-            fileManager.openFile();
-            cursor.savePosition();
-            
-            for (int i = scroll; i < terminal.getHeight() && i < lines.size(); i++) {
-                for (int j = 0; j < lines.get(i).size(); j++) {
-                    System.out.print(lines.get(i).get(j));
-                }
-                System.out.println();
-            }
-
-            cursor.restorePosition();
+            fileManager.openFiles();
         }
         else {
             lines.add(new ArrayList<>());
@@ -54,7 +41,7 @@ class Editor {
         while (loop) {
             keyCode = terminal.readKeys();
             key = (char) keyCode;
-            System.out.print(key);
+            // System.out.print(key);
             // System.out.println(keyCode);
             checkCode();
         }
@@ -65,13 +52,13 @@ class Editor {
     private void checkCode() {
         if (keyCode == KeyCodes.CTRL_C) {
             loop = false;
+            System.out.println(lines);
         }
 
         if (keyCode == KeyCodes.ESC) {
             beginEscapeSequence = true;
         }
-
-        if (beginEscapeSequence) {
+        else if (beginEscapeSequence) {
             switch (keyCode) {
                 case KeyCodes.SQR_BRKT:
                     // backSpace();
@@ -81,84 +68,83 @@ class Editor {
                     break;
             }
         }
-    }
-
-    private void keyTyped(char key) {
-        letter = key;
-        
-        if (isKeyTyped()) {
-            lines.get(cursor.y).add(cursor.x, letter);
+        else {
+            lines.get(cursor.y).add(cursor.x, key);
             cursor.x++;
-            System.out.print(letter);
+            System.out.print(key);
             cursor.printLineAfterCursor(lines.get(cursor.y));
         }
     }
 
-    private boolean isKeyTyped() {
-        boolean isKeyTyped =
-        (Character.isLetterOrDigit(letter)
-        || String.valueOf(letter).matches(SYMBOLS_REGEX))
-        && !cursorMode && !altPressed && !shiftPressed && !ctrlPressed;
-        
-        return isKeyTyped;
+    private void printText() {
+        cursor.savePosition();
+            
+        for (int i = scroll; i < terminal.getHeight() && i < lines.size(); i++) {
+            for (int j = 0; j < lines.get(i).size(); j++) {
+                System.out.print(lines.get(i).get(j));
+            }
+            System.out.println();
+        }
+
+        cursor.restorePosition();
     }
 
     private void keyPressed(char key, int code) {
         action = key;
         
-        switch (code) {
-            case KeyCodes.M:
-            newLine();
-            break;
+        // switch (code) {
+        //     case KeyCodes.M:
+        //     newLine();
+        //     break;
 
-            case KeyCodes.J:
-            tabulate();
-            break;
+        //     case KeyCodes.J:
+        //     tabulate();
+        //     break;
 
-            case KeyCodes.BACKSPACE:
-            backSpace();
-            break;
+        //     case KeyCodes.BACKSPACE:
+        //     backSpace();
+        //     break;
 
-            // MOVE KEYS
-            case KeyCodes.CTRL_J:
-            if (cursorMode || (!cursorMode && ctrlPressed)) {
-                if (cursorMode && ctrlPressed) {
-                    cursor.jumpBackward(lines.get(cursor.y));
-                }
-                else {
-                    cursor.backward();
-                }
-            }
-            break;
+        //     // MOVE KEYS
+        //     case KeyCodes.CTRL_J:
+        //     if (cursorMode || (!cursorMode && ctrlPressed)) {
+        //         if (cursorMode && ctrlPressed) {
+        //             cursor.jumpBackward(lines.get(cursor.y));
+        //         }
+        //         else {
+        //             cursor.backward();
+        //         }
+        //     }
+        //     break;
 
-            case KeyCodes.CTRL_L:
-            if (cursorMode || (!cursorMode && ctrlPressed)) {
-                if (cursorMode && ctrlPressed) {
-                    cursor.jumpForward(lines.get(cursor.y));
-                }
-                else {
-                    cursor.forward(lines.get(cursor.y));
-                }
-            }
-            break;
+        //     case KeyCodes.CTRL_L:
+        //     if (cursorMode || (!cursorMode && ctrlPressed)) {
+        //         if (cursorMode && ctrlPressed) {
+        //             cursor.jumpForward(lines.get(cursor.y));
+        //         }
+        //         else {
+        //             cursor.forward(lines.get(cursor.y));
+        //         }
+        //     }
+        //     break;
 
-            case KeyCodes.CTRL_K:
-            toggleCursorMode();
+        //     case KeyCodes.CTRL_K:
+        //     toggleCursorMode();
 
-            if (cursorMode || (!cursorMode && ctrlPressed)) {
-                cursor.down(lines);
-            }
-            break;
+        //     if (cursorMode || (!cursorMode && ctrlPressed)) {
+        //         cursor.down(lines);
+        //     }
+        //     break;
 
-            case KeyCodes.CTRL_I:
-            if (cursorMode || (!cursorMode && ctrlPressed)) {
-                cursor.up();
-            }
-            break;
+        //     case KeyCodes.CTRL_I:
+        //     if (cursorMode || (!cursorMode && ctrlPressed)) {
+        //         cursor.up();
+        //     }
+        //     break;
 
-            default:
-            break;
-        }
+        //     default:
+        //     break;
+        // }
     }
 
 
@@ -235,16 +221,16 @@ class Editor {
 
     // TOGGLE CURSOR MODE
 
-    private void toggleCursorMode() {
-        if (altPressed) {
-            if (cursorMode) {
-                cursorMode = false;
-                cursor.changeColorWhite();
-            }
-            else {
-                cursorMode = true;
-                cursor.changeColorRed();
-            }
-        }
-    }
+    // private void toggleCursorMode() {
+    //     if (altPressed) {
+    //         if (cursorMode) {
+    //             cursorMode = false;
+    //             cursor.changeColorWhite();
+    //         }
+    //         else {
+    //             cursorMode = true;
+    //             cursor.changeColorRed();
+    //         }
+    //     }
+    // }
 }
