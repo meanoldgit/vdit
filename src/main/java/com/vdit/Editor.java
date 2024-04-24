@@ -41,18 +41,24 @@ class Editor {
         while (loop) {
             keyCode = terminal.readKeys();
             key = (char) keyCode;
-            // System.out.println(keyCode);
-            checkCode();
+            
+            System.out.println(keyCode);
+            if (checkCode()) {
+                lines.get(cursor.y).add(cursor.x, key);
+                cursor.x++;
+                System.out.print(key);
+                // cursor.printLineAfterCursor(lines.get(cursor.y));
+            }
         }
-
+        
         terminal.close();
     }
-
-    private void checkCode() {
+    
+    private boolean checkCode() {
         if (keyCode <= KeyCodes.ESC) {
             if (keyCode == KeyCodes.ESC) {
                 beginEscapeSequence = true;
-                return;
+                return false;
             }
             
             switch (keyCode) {
@@ -60,13 +66,34 @@ class Editor {
                     loop = false;
                     System.out.println(lines);
                     break;
+
+                case KeyCodes.INTRO:
+                    newLine();
+                    break;
+                    
+                case KeyCodes.BACKSPACE:
+                    backspace();
+                    break;
+
+                case KeyCodes.TAB:
+                    tab();
+                    break;
             
                 default:
                     break;
             }
+
+            return false;
         }
         
         if (beginEscapeSequence) {
+            if (squareBracket) {
+                if (keyCode == KeyCodes.BACKTAB) {
+                    backtab();
+                }
+                return false;
+            }
+            
             switch (keyCode) {
                 case KeyCodes.SQR_BRKT:
                     squareBracket = true;
@@ -77,13 +104,11 @@ class Editor {
                     squareBracket = false;
                     break;
             }
+
+            return false;
         }
 
-        lines.get(cursor.y).add(cursor.x, key);
-        cursor.x++;
-        System.out.print(key);
-        // cursor.printLineAfterCursor(lines.get(cursor.y));
-
+        return true;
     }
 
     private void printText() {
@@ -108,11 +133,11 @@ class Editor {
         //     break;
 
         //     case KeyCodes.J:
-        //     tabulate();
+        //     tab();
         //     break;
 
         //     case KeyCodes.BACKSPACE:
-        //     backSpace();
+        //     backspace();
         //     break;
 
         //     // MOVE KEYS
@@ -200,12 +225,12 @@ class Editor {
 
     // BACK SPACE
 
-    private void backSpace() {
+    private void backspace() {
         if (cursor.x > 0) {
             cursor.x--;
             lines.get(cursor.y).remove(cursor.x);
             
-            // Backspace, print empty space, backspace again.
+            // Backspace, print empty space, S again.
             System.out.print(action + " " + action);
             
             cursor.printLineAfterCursor(lines.get(cursor.y));
@@ -215,7 +240,7 @@ class Editor {
 
     // TABULATION
 
-    private void tabulate() {
+    private void tab() {
         for (int i = 0; i < 4; i++) {
             lines.get(cursor.y).add(cursor.x, EMPTY_SPACE);
             cursor.x++;
@@ -225,7 +250,7 @@ class Editor {
         cursor.printLineAfterCursor(lines.get(cursor.y));
     }
 
-    private void reverseTab() {}
+    private void backtab() {}
 
 
     // TOGGLE CURSOR MODE
