@@ -15,12 +15,12 @@ class Editor {
     private boolean cursorMode = false;
     private boolean loop = true;
     private boolean beginEscapeSequence = false;
+    private boolean squareBracket = false;
 
     char key;
     int keyCode;
     
     private final char EMPTY_SPACE = ' ';
-    private final String SYMBOLS_REGEX = "[ .,:;_+-/\\*!\"'%$&@#~|()=¿?<>{}\\[\\]]";
 
     public Editor(String files) {
         fileManager = new FileManager(files, lines);
@@ -41,7 +41,6 @@ class Editor {
         while (loop) {
             keyCode = terminal.readKeys();
             key = (char) keyCode;
-            // System.out.print(key);
             // System.out.println(keyCode);
             checkCode();
         }
@@ -50,30 +49,41 @@ class Editor {
     }
 
     private void checkCode() {
-        if (keyCode == KeyCodes.CTRL_C) {
-            loop = false;
-            System.out.println(lines);
-        }
-
-        if (keyCode == KeyCodes.ESC) {
-            beginEscapeSequence = true;
-        }
-        else if (beginEscapeSequence) {
+        if (keyCode <= KeyCodes.ESC) {
+            if (keyCode == KeyCodes.ESC) {
+                beginEscapeSequence = true;
+                return;
+            }
+            
             switch (keyCode) {
-                case KeyCodes.SQR_BRKT:
-                    // backSpace();
+                case KeyCodes.CTRL_C:
+                    loop = false;
+                    System.out.println(lines);
                     break;
             
                 default:
                     break;
             }
         }
-        else {
-            lines.get(cursor.y).add(cursor.x, key);
-            cursor.x++;
-            System.out.print(key);
-            cursor.printLineAfterCursor(lines.get(cursor.y));
+        
+        if (beginEscapeSequence) {
+            switch (keyCode) {
+                case KeyCodes.SQR_BRKT:
+                    squareBracket = true;
+                    break;
+            
+                default:
+                    beginEscapeSequence = false;
+                    squareBracket = false;
+                    break;
+            }
         }
+
+        lines.get(cursor.y).add(cursor.x, key);
+        cursor.x++;
+        System.out.print(key);
+        // cursor.printLineAfterCursor(lines.get(cursor.y));
+
     }
 
     private void printText() {
@@ -181,7 +191,6 @@ class Editor {
             for (int j = 0; j < lines.get(i).size(); j++) {
                 System.out.print(lines.get(i).get(j));
             }
-
             System.out.println();
         }
 
@@ -216,7 +225,7 @@ class Editor {
         cursor.printLineAfterCursor(lines.get(cursor.y));
     }
 
-    private void backTab() {}
+    private void reverseTab() {}
 
 
     // TOGGLE CURSOR MODE
