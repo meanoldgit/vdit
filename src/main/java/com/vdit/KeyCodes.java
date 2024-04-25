@@ -27,6 +27,7 @@ class KeyCodes {
     public static final int CTRL_X = 24;
     public static final int CTRL_Y = 25;
     public static final int CTRL_Z = 26;
+    public static final int CTRL_Ç = 28;
 
     public static final int SHIFT_A = 65;
     public static final int SHIFT_B = 66;
@@ -83,10 +84,9 @@ class KeyCodes {
     public static final int Z = 122;
 
     public static final int TAB = 9;
-    public static final int INTRO = 13;
+    public static final int ENTER = 13;
     public static final int ESC = 27;
-    public static final int ALT = 27;
-    public static final int SQR_BRKT = 91; // '['
+    public static final int SQR_BRKT = 91;
     public static final int BACKTAB = Z;
     public static final int BACKSPACE = 127;
     public static final int[] BACKTAB_SEQ = {ESC, SQR_BRKT, BACKTAB};

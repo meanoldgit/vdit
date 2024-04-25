@@ -11,7 +11,8 @@ public class TerminalManager {
     private boolean loop = true;
     private int width = 0;
     private int height = 0;
-    private final String disableInterruptSignals = "stty intr undef susp undef eof undef";
+    // private final String disableInterruptSignals = "stty intr undef susp undef eof undef";
+    private final String disableInterruptSignals = "stty intr undef eof undef";
     private final String resetTerminalSettings = "stty sane -brkint -imaxbel";
     
     private Thread checkSizeThread = new Thread(() -> {

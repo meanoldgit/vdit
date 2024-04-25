@@ -10,15 +10,14 @@ class Editor {
     
     private int scroll = 0;
     private char action;
-    private char letter;
 
     private boolean cursorMode = false;
     private boolean loop = true;
     private boolean beginEscapeSequence = false;
     private boolean squareBracket = false;
 
-    char key;
-    int keyCode;
+    private char key;
+    private int keyCode;
     
     private final char EMPTY_SPACE = ' ';
 
@@ -41,24 +40,88 @@ class Editor {
         while (loop) {
             keyCode = terminal.readKeys();
             key = (char) keyCode;
+            // System.out.println(keyCode);
             
-            System.out.println(keyCode);
-            if (checkCode()) {
+            if (!specialKey() && !cursorMode) {
                 lines.get(cursor.y).add(cursor.x, key);
                 cursor.x++;
                 System.out.print(key);
                 // cursor.printLineAfterCursor(lines.get(cursor.y));
             }
+            else {
+                cursorModeEvents();
+            }
         }
         
         terminal.close();
     }
+
+
+    // CURSOR MODE
+
+    private void cursorModeEvents() {
+        switch (keyCode) {
+            case KeyCodes.I:
+                cursor.up();
+                break;
+
+            case KeyCodes.L:
+                cursor.forward(lines.get(cursor.y));
+                break;
+            
+            case KeyCodes.J:
+                cursor.backward();
+                break;
+
+            case KeyCodes.K:
+                cursor.down(lines);
+                break;
+            
+            case KeyCodes.CTRL_L:
+                cursor.jumpForward(lines.get(cursor.y));
+                break;
+                
+            case KeyCodes.CTRL_J:
+                cursor.jumpBackward(lines.get(cursor.y));
+                break;
+
+            default:
+                break;
+        }
+    }
     
-    private boolean checkCode() {
+
+    // ESCAPE SEQUENCES
+
+    private boolean specialKey() {
+        if (beginEscapeSequence) {
+            if (squareBracket) {
+                if (keyCode == KeyCodes.BACKTAB) {
+                    backtab();
+                }
+                beginEscapeSequence = false;
+                squareBracket = false;
+                return true;
+            }
+            
+            switch (keyCode) {
+                case KeyCodes.SQR_BRKT:
+                    squareBracket = true;
+                    break;
+            
+                default:
+                    beginEscapeSequence = false;
+                    squareBracket = false;
+                    break;
+            }
+
+            return true;
+        }
+
         if (keyCode <= KeyCodes.ESC) {
             if (keyCode == KeyCodes.ESC) {
                 beginEscapeSequence = true;
-                return false;
+                return true;
             }
             
             switch (keyCode) {
@@ -67,7 +130,11 @@ class Editor {
                     System.out.println(lines);
                     break;
 
-                case KeyCodes.INTRO:
+                case KeyCodes.CTRL_K:
+                    toggleCursorMode();
+                    break;
+
+                case KeyCodes.ENTER:
                     newLine();
                     break;
                     
@@ -83,32 +150,10 @@ class Editor {
                     break;
             }
 
-            return false;
-        }
-        
-        if (beginEscapeSequence) {
-            if (squareBracket) {
-                if (keyCode == KeyCodes.BACKTAB) {
-                    backtab();
-                }
-                return false;
-            }
-            
-            switch (keyCode) {
-                case KeyCodes.SQR_BRKT:
-                    squareBracket = true;
-                    break;
-            
-                default:
-                    beginEscapeSequence = false;
-                    squareBracket = false;
-                    break;
-            }
-
-            return false;
+            return true;
         }
 
-        return true;
+        return false;
     }
 
     private void printText() {
@@ -122,64 +167,6 @@ class Editor {
         }
 
         cursor.restorePosition();
-    }
-
-    private void keyPressed(char key, int code) {
-        action = key;
-        
-        // switch (code) {
-        //     case KeyCodes.M:
-        //     newLine();
-        //     break;
-
-        //     case KeyCodes.J:
-        //     tab();
-        //     break;
-
-        //     case KeyCodes.BACKSPACE:
-        //     backspace();
-        //     break;
-
-        //     // MOVE KEYS
-        //     case KeyCodes.CTRL_J:
-        //     if (cursorMode || (!cursorMode && ctrlPressed)) {
-        //         if (cursorMode && ctrlPressed) {
-        //             cursor.jumpBackward(lines.get(cursor.y));
-        //         }
-        //         else {
-        //             cursor.backward();
-        //         }
-        //     }
-        //     break;
-
-        //     case KeyCodes.CTRL_L:
-        //     if (cursorMode || (!cursorMode && ctrlPressed)) {
-        //         if (cursorMode && ctrlPressed) {
-        //             cursor.jumpForward(lines.get(cursor.y));
-        //         }
-        //         else {
-        //             cursor.forward(lines.get(cursor.y));
-        //         }
-        //     }
-        //     break;
-
-        //     case KeyCodes.CTRL_K:
-        //     toggleCursorMode();
-
-        //     if (cursorMode || (!cursorMode && ctrlPressed)) {
-        //         cursor.down(lines);
-        //     }
-        //     break;
-
-        //     case KeyCodes.CTRL_I:
-        //     if (cursorMode || (!cursorMode && ctrlPressed)) {
-        //         cursor.up();
-        //     }
-        //     break;
-
-        //     default:
-        //     break;
-        // }
     }
 
 
@@ -208,7 +195,7 @@ class Editor {
         cursor.y++;
         cursor.x = 0;
         
-        System.out.print(action);
+        System.out.print("\n");
         cursor.clearScreenAfterCursor();
         cursor.savePosition();
 
@@ -255,16 +242,16 @@ class Editor {
 
     // TOGGLE CURSOR MODE
 
-    // private void toggleCursorMode() {
-    //     if (altPressed) {
-    //         if (cursorMode) {
-    //             cursorMode = false;
-    //             cursor.changeColorWhite();
-    //         }
-    //         else {
-    //             cursorMode = true;
-    //             cursor.changeColorRed();
-    //         }
-    //     }
-    // }
+    private void toggleCursorMode() {
+        if (true) {
+            if (cursorMode) {
+                cursorMode = false;
+                cursor.changeColorWhite();
+            }
+            else {
+                cursorMode = true;
+                cursor.changeColorRed();
+            }
+        }
+    }
 }
