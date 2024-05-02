@@ -27,7 +27,6 @@ class KeyCodes {
     public static final int CTRL_X = 24;
     public static final int CTRL_Y = 25;
     public static final int CTRL_Z = 26;
-    public static final int CTRL_Ç = 28;
 
     public static final int SHIFT_A = 65;
     public static final int SHIFT_B = 66;

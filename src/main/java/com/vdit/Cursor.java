@@ -2,20 +2,28 @@ package com.vdit;
 import java.util.ArrayList;
 
 public class Cursor {
-    int x = 0;
-    int y = 0;
+    private ArrayList<ArrayList<Character>> lines;
+
+    public int x = 0;
+    public int y = 0;
 
     private final char EMPTY_SPACE = ' ';
     private final String CURSOR_UP = "\033[A";
     private final String CURSOR_DOWN = "\033[B";
     private final String CURSOR_FORWARD = "\033[C";
     private final String CURSOR_BACKWARD = "\033[D";
+    private final String ENABLE_BLINK = "\033[?12h";
+    private final String DISABLE_BLINK = "\033[?12l";
     private final String SAVE_CURSOR_POSITION = "\033[s";
     private final String RESTORE_CURSOR_POSITION = "\033[u";
-    // private final String CLEAR_LINE_AFTER_CURSOR = "\033[K";
+    private final String CLEAR_LINE_AFTER_CURSOR = "\033[K";
     private final String CLEAR_SCREEN_AFTER_CURSOR = "\033[J";
     private final String CURSOR_COLOR_RED = "\033]12;red\007";
     private final String CURSOR_COLOR_WHITE = "\033]12;white\007";
+
+    public Cursor(ArrayList<ArrayList<Character>> lines) {
+        this.lines = lines;
+    }
 
     private void action(String action) {
         System.out.print(action);
@@ -28,7 +36,7 @@ public class Cursor {
         }
     }
 
-    public void down(ArrayList<ArrayList<Character>> lines) {
+    public void down() {
         if (y + 1 < lines.size()) {
             y++;
             action(CURSOR_DOWN);
@@ -42,53 +50,57 @@ public class Cursor {
         }
     }
 
-    public void forward(ArrayList<Character> col) {
-        if (x < col.size()) {
+    public void forward() {
+        if (x < lines.get(y).size()) {
             x++;
             action(CURSOR_FORWARD);
         }
     }
     
-    public void printLineAfterCursor(ArrayList<Character> col) {
+    public void printLineAfterCursor() {
         savePosition();
         
-        for (int i = x; i < col.size(); i++) {
-            System.out.print(col.get(i));
+        for (int i = x; i < lines.get(y).size(); i++) {
+            System.out.print(lines.get(y).get(i));
         }
 
         System.out.print(' ');
         restorePosition();
     }
     
-    public void jumpBackward(ArrayList<Character> col) {
-        if (col.get(x - 1) != EMPTY_SPACE) {
-            while (col.get(x - 1) != EMPTY_SPACE) {
+    public void jumpBackward() {
+        if (lines.get(y).get(x - 1) != EMPTY_SPACE) {
+            while (lines.get(y).get(x - 1) != EMPTY_SPACE) {
                 backward();
             }
         }
         else {
-            while (col.get(x - 1) == EMPTY_SPACE) {
+            while (lines.get(y).get(x - 1) == EMPTY_SPACE) {
                 backward();
             }
         }
     }
 
-    public void jumpForward(ArrayList<Character> col) {
-        if (col.get(x) != EMPTY_SPACE) {
-            while (col.get(x) != EMPTY_SPACE) {
-                forward(col);
+    public void jumpForward() {
+        if (lines.get(y).get(x) != EMPTY_SPACE) {
+            while (lines.get(y).get(x) != EMPTY_SPACE) {
+                forward();
             }
         }
         else {
-            while (col.get(x) == EMPTY_SPACE) {
-                forward(col);
+            while (lines.get(y).get(x) == EMPTY_SPACE) {
+                forward();
             }
         }
     }
-    
+
     public void jumpToLineStart() {}
-
+    
     public void jumpToLineEnd() {}
+
+    public void disableBlink() { action(DISABLE_BLINK); }
+
+    public void enableBlink() { action(ENABLE_BLINK); }
 
     public void clearScreenAfterCursor() { action(CLEAR_SCREEN_AFTER_CURSOR); }
 

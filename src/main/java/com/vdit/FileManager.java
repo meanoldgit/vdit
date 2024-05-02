@@ -7,10 +7,10 @@ import java.util.ArrayList;
 import java.util.Scanner;
 
 public class FileManager {
-    File file;
-    String fileName;
-    ArrayList<ArrayList<Character>> lines;
-    ArrayList<ArrayList<ArrayList<Character>>> files = new ArrayList<>();
+    private File file;
+    private String fileName;
+    private ArrayList<ArrayList<Character>> lines;
+    // private ArrayList<ArrayList<ArrayList<Character>>> files = new ArrayList<>();
 
     public FileManager(String fileName, ArrayList<ArrayList<Character>> lines) {
         this.fileName = fileName;

@@ -4,8 +4,9 @@ import java.util.ArrayList;
 
 class Editor {
     private ArrayList<ArrayList<Character>> lines = new ArrayList<>();
+    // private ArrayList<StringBuilder> lines = new ArrayList<>();
     private TerminalManager terminal = new TerminalManager();
-    private Cursor cursor = new Cursor();
+    private Cursor cursor = new Cursor(lines);
     private FileManager fileManager;
     
     private int scroll = 0;
@@ -33,6 +34,8 @@ class Editor {
         
         terminal.command("clear");
         System.out.println(terminal.getWidth() + "x" + terminal.getHeight());
+        cursor.enableBlink();
+        cursor.changeColorWhite();
         // TODO: Remove all '\n' when opening file.
     }
 
@@ -40,120 +43,24 @@ class Editor {
         while (loop) {
             keyCode = terminal.readKeys();
             key = (char) keyCode;
-            // System.out.println(keyCode);
+            
+            cursor.savePosition();
+            System.out.print("\033["+terminal.getHeight()/2+";1H");
+            System.out.println(keyCode);
+            cursor.restorePosition();
             
             if (!specialKey() && !cursorMode) {
                 lines.get(cursor.y).add(cursor.x, key);
                 cursor.x++;
                 System.out.print(key);
-                // cursor.printLineAfterCursor(lines.get(cursor.y));
+                cursor.printLineAfterCursor();
             }
-            else {
+            else if (cursorMode) {
                 cursorModeEvents();
             }
         }
         
         terminal.close();
-    }
-
-
-    // CURSOR MODE
-
-    private void cursorModeEvents() {
-        switch (keyCode) {
-            case KeyCodes.I:
-                cursor.up();
-                break;
-
-            case KeyCodes.L:
-                cursor.forward(lines.get(cursor.y));
-                break;
-            
-            case KeyCodes.J:
-                cursor.backward();
-                break;
-
-            case KeyCodes.K:
-                cursor.down(lines);
-                break;
-            
-            case KeyCodes.CTRL_L:
-                cursor.jumpForward(lines.get(cursor.y));
-                break;
-                
-            case KeyCodes.CTRL_J:
-                cursor.jumpBackward(lines.get(cursor.y));
-                break;
-
-            default:
-                break;
-        }
-    }
-    
-
-    // ESCAPE SEQUENCES
-
-    private boolean specialKey() {
-        if (beginEscapeSequence) {
-            if (squareBracket) {
-                if (keyCode == KeyCodes.BACKTAB) {
-                    backtab();
-                }
-                beginEscapeSequence = false;
-                squareBracket = false;
-                return true;
-            }
-            
-            switch (keyCode) {
-                case KeyCodes.SQR_BRKT:
-                    squareBracket = true;
-                    break;
-            
-                default:
-                    beginEscapeSequence = false;
-                    squareBracket = false;
-                    break;
-            }
-
-            return true;
-        }
-
-        if (keyCode <= KeyCodes.ESC) {
-            if (keyCode == KeyCodes.ESC) {
-                beginEscapeSequence = true;
-                return true;
-            }
-            
-            switch (keyCode) {
-                case KeyCodes.CTRL_C:
-                    loop = false;
-                    System.out.println(lines);
-                    break;
-
-                case KeyCodes.CTRL_K:
-                    toggleCursorMode();
-                    break;
-
-                case KeyCodes.ENTER:
-                    newLine();
-                    break;
-                    
-                case KeyCodes.BACKSPACE:
-                    backspace();
-                    break;
-
-                case KeyCodes.TAB:
-                    tab();
-                    break;
-            
-                default:
-                    break;
-            }
-
-            return true;
-        }
-
-        return false;
     }
 
     private void printText() {
@@ -220,7 +127,7 @@ class Editor {
             // Backspace, print empty space, S again.
             System.out.print(action + " " + action);
             
-            cursor.printLineAfterCursor(lines.get(cursor.y));
+            cursor.printLineAfterCursor();
         }
     }
 
@@ -234,7 +141,7 @@ class Editor {
             System.out.print(EMPTY_SPACE);
         }
         
-        cursor.printLineAfterCursor(lines.get(cursor.y));
+        cursor.printLineAfterCursor();
     }
 
     private void backtab() {}
@@ -243,15 +150,122 @@ class Editor {
     // TOGGLE CURSOR MODE
 
     private void toggleCursorMode() {
-        if (true) {
-            if (cursorMode) {
-                cursorMode = false;
-                cursor.changeColorWhite();
-            }
-            else {
-                cursorMode = true;
-                cursor.changeColorRed();
-            }
+        cursorMode = !cursorMode;
+        if (cursorMode) {
+            cursor.changeColorRed();
+            cursor.disableBlink();
         }
+        else {
+            cursor.changeColorWhite();
+            cursor.enableBlink();
+        }
+    }
+
+    
+    // CURSOR MODE
+
+    private void cursorModeEvents() {
+        switch (keyCode) {
+            case KeyCodes.I:
+                cursor.up();
+                break;
+
+            case KeyCodes.L:
+                cursor.forward();
+                break;
+            
+            case KeyCodes.J:
+                cursor.backward();
+                break;
+
+            case KeyCodes.K:
+                cursor.down();
+                break;
+            
+            case KeyCodes.CTRL_L:
+                cursor.jumpForward();
+                break;
+                
+            case KeyCodes.CTRL_J:
+                cursor.jumpBackward();
+                break;
+
+            default:
+                break;
+        }
+    }
+        
+    
+    // SPECIAL KEYS
+
+    private boolean specialKey() {
+        if (beginEscapeSequence) {
+            if (squareBracket) {
+                if (keyCode == KeyCodes.BACKTAB) {
+                    backtab();
+                }
+                beginEscapeSequence = false;
+                squareBracket = false;
+                return true;
+            }
+            
+            switch (keyCode) {
+                case KeyCodes.SQR_BRKT:
+                    squareBracket = true;
+                    break;
+            
+                default:
+                    beginEscapeSequence = false;
+                    squareBracket = false;
+                    break;
+            }
+
+            return true;
+        }
+
+        if (keyCode <= KeyCodes.ESC) {
+            if (keyCode == KeyCodes.ESC) {
+                beginEscapeSequence = true;
+                return true;
+            }
+            
+            switch (keyCode) {
+                case KeyCodes.CTRL_C:
+                    loop = false;
+                    printText();
+                    break;
+
+                case KeyCodes.CTRL_K:
+                    toggleCursorMode();
+                    break;
+
+                case KeyCodes.CTRL_L:
+                    cursor.forward();
+                    break;
+
+                case KeyCodes.CTRL_J:
+                    cursor.backward();
+                    break;
+
+                case KeyCodes.ENTER:
+                    newLine();
+                    break;
+                    
+                case KeyCodes.BACKSPACE:
+                    backspace();
+                    break;
+
+                case KeyCodes.TAB:
+                    tab();
+                    break;
+            
+                default:
+                    break;
+            }
+
+            return true;
+        }
+
+        return false;
     }
 }
