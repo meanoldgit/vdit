@@ -9,10 +9,10 @@ import java.util.Scanner;
 public class FileManager {
     private File file;
     private String fileName;
-    private ArrayList<ArrayList<Character>> lines;
+    private ArrayList<StringBuilder> lines;
     // private ArrayList<ArrayList<ArrayList<Character>>> files = new ArrayList<>();
 
-    public FileManager(String fileName, ArrayList<ArrayList<Character>> lines) {
+    public FileManager(String fileName, ArrayList<StringBuilder> lines) {
         this.fileName = fileName;
         this.lines = lines;
     }
@@ -25,7 +25,7 @@ public class FileManager {
             readFile();
         }
         else {
-            lines.add(new ArrayList<>());
+            lines.add(new StringBuilder());
         }
     }
 
@@ -38,10 +38,10 @@ public class FileManager {
             while (fscan.hasNextLine()) {
                 line = lines.size();
                 data = fscan.nextLine();
-                lines.add(new ArrayList<>());
+                lines.add(new StringBuilder());
 
                 for (int i = 0; i < data.length(); i++) {
-                    lines.get(line).add(data.charAt(i));
+                    lines.get(line).append(data.charAt(i));
                 }
             }
 

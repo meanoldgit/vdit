@@ -3,24 +3,21 @@ package com.vdit;
 import java.util.ArrayList;
 
 class Editor {
-    private ArrayList<ArrayList<Character>> lines = new ArrayList<>();
-    // private ArrayList<StringBuilder> lines = new ArrayList<>();
+    private ArrayList<StringBuilder> lines = new ArrayList<>();
     private TerminalManager terminal = new TerminalManager();
     private Cursor cursor = new Cursor(lines);
     private FileManager fileManager;
     
+    private final char EMPTY_SPACE = ' ';
     private int scroll = 0;
     private char action;
-
-    private boolean cursorMode = false;
-    private boolean loop = true;
-    private boolean beginEscapeSequence = false;
-    private boolean squareBracket = false;
-
     private char key;
     private int keyCode;
-    
-    private final char EMPTY_SPACE = ' ';
+
+    private boolean beginEscapeSequence = false;
+    private boolean squareBracket = false;
+    private boolean cursorMode = false;
+    private boolean loop = true;
 
     public Editor(String files) {
         fileManager = new FileManager(files, lines);
@@ -29,7 +26,7 @@ class Editor {
             fileManager.openFiles();
         }
         else {
-            lines.add(new ArrayList<>());
+            lines.add(new StringBuilder());
         }
         
         terminal.command("clear");
@@ -44,13 +41,13 @@ class Editor {
             keyCode = terminal.readKeys();
             key = (char) keyCode;
             
-            cursor.savePosition();
-            System.out.print("\033["+terminal.getHeight()/2+";1H");
-            System.out.println(keyCode);
-            cursor.restorePosition();
+            // cursor.savePosition();
+            // System.out.print("\033["+terminal.getHeight()/2+";1H");
+            // System.out.println(keyCode);
+            // cursor.restorePosition();
             
             if (!specialKey() && !cursorMode) {
-                lines.get(cursor.y).add(cursor.x, key);
+                lines.get(cursor.y).insert(cursor.x, key);
                 cursor.x++;
                 System.out.print(key);
                 cursor.printLineAfterCursor();
@@ -67,8 +64,8 @@ class Editor {
         cursor.savePosition();
             
         for (int i = scroll; i < terminal.getHeight() && i < lines.size(); i++) {
-            for (int j = 0; j < lines.get(i).size(); j++) {
-                System.out.print(lines.get(i).get(j));
+            for (int j = 0; j < lines.get(i).length(); j++) {
+                System.out.print(lines.get(i).charAt(j));
             }
             System.out.println();
         }
@@ -80,20 +77,20 @@ class Editor {
     // NEW LINE
 
     private void newLine() {
-        lines.add(cursor.y + 1, new ArrayList<>());
+        lines.add(cursor.y + 1, new StringBuilder());
         splitCurrentLine();
         printNewLine();
     }
 
     private void splitCurrentLine() {
-        int size = lines.get(cursor.y).size();
+        int size = lines.get(cursor.y).length();
         int newLine = cursor.y + 1;
         if (cursor.x < size) {
             cursor.clearScreenAfterCursor();
 
             for (int i = cursor.x; i < size; i++) {
-                lines.get(newLine).add(lines.get(cursor.y).get(cursor.x));
-                lines.get(cursor.y).remove(cursor.x);
+                lines.get(newLine).append(lines.get(cursor.y).charAt(cursor.x));
+                lines.get(cursor.y).deleteCharAt(cursor.x);
             }
         }
     }
@@ -107,8 +104,8 @@ class Editor {
         cursor.savePosition();
 
         for (int i = cursor.y; i < lines.size(); i++) {
-            for (int j = 0; j < lines.get(i).size(); j++) {
-                System.out.print(lines.get(i).get(j));
+            for (int j = 0; j < lines.get(i).length(); j++) {
+                System.out.print(lines.get(i).charAt(j));
             }
             System.out.println();
         }
@@ -122,7 +119,7 @@ class Editor {
     private void backspace() {
         if (cursor.x > 0) {
             cursor.x--;
-            lines.get(cursor.y).remove(cursor.x);
+            lines.get(cursor.y).deleteCharAt(cursor.x);
             
             // Backspace, print empty space, S again.
             System.out.print(action + " " + action);
@@ -136,7 +133,7 @@ class Editor {
 
     private void tab() {
         for (int i = 0; i < 4; i++) {
-            lines.get(cursor.y).add(cursor.x, EMPTY_SPACE);
+            lines.get(cursor.y).insert(cursor.x, EMPTY_SPACE);
             cursor.x++;
             System.out.print(EMPTY_SPACE);
         }

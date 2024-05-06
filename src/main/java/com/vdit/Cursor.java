@@ -2,7 +2,7 @@ package com.vdit;
 import java.util.ArrayList;
 
 public class Cursor {
-    private ArrayList<ArrayList<Character>> lines;
+    private ArrayList<StringBuilder> lines;
 
     public int x = 0;
     public int y = 0;
@@ -21,7 +21,7 @@ public class Cursor {
     private final String CURSOR_COLOR_RED = "\033]12;red\007";
     private final String CURSOR_COLOR_WHITE = "\033]12;white\007";
 
-    public Cursor(ArrayList<ArrayList<Character>> lines) {
+    public Cursor(ArrayList<StringBuilder> lines) {
         this.lines = lines;
     }
 
@@ -51,7 +51,7 @@ public class Cursor {
     }
 
     public void forward() {
-        if (x < lines.get(y).size()) {
+        if (x < lines.get(y).length()) {
             x++;
             action(CURSOR_FORWARD);
         }
@@ -60,8 +60,8 @@ public class Cursor {
     public void printLineAfterCursor() {
         savePosition();
         
-        for (int i = x; i < lines.get(y).size(); i++) {
-            System.out.print(lines.get(y).get(i));
+        for (int i = x; i < lines.get(y).length(); i++) {
+            System.out.print(lines.get(y).charAt(i));
         }
 
         System.out.print(' ');
@@ -69,26 +69,26 @@ public class Cursor {
     }
     
     public void jumpBackward() {
-        if (lines.get(y).get(x - 1) != EMPTY_SPACE) {
-            while (lines.get(y).get(x - 1) != EMPTY_SPACE) {
+        if (lines.get(y).charAt(x - 1) != EMPTY_SPACE) {
+            while (lines.get(y).charAt(x - 1) != EMPTY_SPACE) {
                 backward();
             }
         }
         else {
-            while (lines.get(y).get(x - 1) == EMPTY_SPACE) {
+            while (lines.get(y).charAt(x - 1) == EMPTY_SPACE) {
                 backward();
             }
         }
     }
 
     public void jumpForward() {
-        if (lines.get(y).get(x) != EMPTY_SPACE) {
-            while (lines.get(y).get(x) != EMPTY_SPACE) {
+        if (lines.get(y).charAt(x) != EMPTY_SPACE) {
+            while (lines.get(y).charAt(x) != EMPTY_SPACE) {
                 forward();
             }
         }
         else {
-            while (lines.get(y).get(x) == EMPTY_SPACE) {
+            while (lines.get(y).charAt(x) == EMPTY_SPACE) {
                 forward();
             }
         }
