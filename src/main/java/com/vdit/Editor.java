@@ -47,7 +47,8 @@ class Editor {
             // cursor.restorePosition();
             
             if (!specialKey() && !cursorMode) {
-                lines.get(cursor.y).insert(cursor.x, key);
+                StringBuilder line = lines.get(cursor.y);
+                line.insert(cursor.x, key);
                 cursor.x++;
                 System.out.print(key);
                 cursor.printLineAfterCursor();
@@ -83,14 +84,15 @@ class Editor {
     }
 
     private void splitCurrentLine() {
-        int size = lines.get(cursor.y).length();
+        StringBuilder line = lines.get(cursor.y);
+        int length = line.length();
         int newLine = cursor.y + 1;
-        if (cursor.x < size) {
-            cursor.clearScreenAfterCursor();
 
-            for (int i = cursor.x; i < size; i++) {
-                lines.get(newLine).append(lines.get(cursor.y).charAt(cursor.x));
-                lines.get(cursor.y).deleteCharAt(cursor.x);
+        if (cursor.x < length) {
+            cursor.clearScreenAfterCursor();
+            for (int i = cursor.x; i < length; i++) {
+                lines.get(newLine).append(line.charAt(cursor.x));
+                line.deleteCharAt(cursor.x);
             }
         }
     }
@@ -117,9 +119,10 @@ class Editor {
     // BACK SPACE
 
     private void backspace() {
+        StringBuilder line = lines.get(cursor.y);
         if (cursor.x > 0) {
             cursor.x--;
-            lines.get(cursor.y).deleteCharAt(cursor.x);
+            line.deleteCharAt(cursor.x);
             
             // Backspace, print empty space, S again.
             System.out.print(action + " " + action);
@@ -132,8 +135,9 @@ class Editor {
     // TABULATION
 
     private void tab() {
+        StringBuilder line = lines.get(cursor.y);
         for (int i = 0; i < 4; i++) {
-            lines.get(cursor.y).insert(cursor.x, EMPTY_SPACE);
+            line.insert(cursor.x, EMPTY_SPACE);
             cursor.x++;
             System.out.print(EMPTY_SPACE);
         }
