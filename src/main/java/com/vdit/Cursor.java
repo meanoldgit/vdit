@@ -58,13 +58,13 @@ public class Cursor {
     }
     
     public void printLineAfterCursor() {
+        StringBuilder line = lines.get(y);
         savePosition();
         
-        for (int i = x; i < lines.get(y).length(); i++) {
-            System.out.print(lines.get(y).charAt(i));
+        for (int i = x; i < line.length(); i++) {
+            System.out.print(line.charAt(i));
         }
 
-        System.out.print(' ');
         restorePosition();
     }
     

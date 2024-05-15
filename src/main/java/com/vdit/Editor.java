@@ -47,11 +47,12 @@ class Editor {
             // cursor.restorePosition();
             
             if (!specialKey() && !cursorMode) {
-                StringBuilder line = lines.get(cursor.y);
-                line.insert(cursor.x, key);
-                cursor.x++;
-                System.out.print(key);
-                cursor.printLineAfterCursor();
+                type();
+
+                //! ESC triggers sequence searching
+                //! which blocks keys from being pressed
+                //! TODO: must be fixed
+                
             }
             else if (cursorMode) {
                 cursorModeEvents();
@@ -59,6 +60,14 @@ class Editor {
         }
         
         terminal.close();
+    }
+
+    private void type() {
+        StringBuilder line = lines.get(cursor.y);
+        line.insert(cursor.x, key);
+        cursor.x++;
+        System.out.print(key);
+        cursor.printLineAfterCursor();
     }
 
     private void printText() {
