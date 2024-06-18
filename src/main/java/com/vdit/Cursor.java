@@ -18,8 +18,8 @@ public class Cursor {
     private final String RESTORE_CURSOR_POSITION = "\033[u";
     private final String CLEAR_LINE_AFTER_CURSOR = "\033[K";
     private final String CLEAR_SCREEN_AFTER_CURSOR = "\033[J";
-    private final String CURSOR_COLOR_RED = "\033]12;red\007";
-    private final String CURSOR_COLOR_WHITE = "\033]12;white\007";
+    private final String CHANGE_CURSOR_COLOR_RED = "\033]12;red\007";
+    private final String CHANGE_CURSOR_COLOR_WHITE = "\033]12;white\007";
 
     public Cursor(ArrayList<StringBuilder> lines) {
         this.lines = lines;
@@ -108,7 +108,9 @@ public class Cursor {
 
     public void restorePosition() { action(RESTORE_CURSOR_POSITION); }
 
-    public void changeColorRed() { action(CURSOR_COLOR_RED); }
+    public void changeColorRed() { action(CHANGE_CURSOR_COLOR_RED); }
 
-    public void changeColorWhite() { action(CURSOR_COLOR_WHITE); }
+    public void changeColorWhite() { action(CHANGE_CURSOR_COLOR_WHITE); }
+    
+    public void blank() { action(""); }
 }

@@ -10,7 +10,6 @@ public class FileManager {
     private File file;
     private String fileName;
     private ArrayList<StringBuilder> lines;
-    // private ArrayList<ArrayList<ArrayList<Character>>> files = new ArrayList<>();
 
     public FileManager(String fileName, ArrayList<StringBuilder> lines) {
         this.fileName = fileName;
